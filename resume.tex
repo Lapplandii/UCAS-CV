@@ -1,0 +1,283 @@
+%***修改自Overleaf方鸿渐中文简历，以及参考了NPU-CV（https://github.com/CSW33/NPU-CV/tree/main）简历模板中的代码
+%***页眉页脚的素材来自NPU-CV简历模板，经过了调色处理成国科大蓝
+%***logo素材均来自国科大、中国科学院官网
+
+%***"%"后面的所有内容是注释而非代码，不会输出到最后的PDF中
+%***使用本模板，只需要参照输出的PDF，在本文档的相应位置做简单替换即可
+%***修改之后，输出更新后的PDF，点击Overleaf中的“Recompile”按钮即可
+
+
+%*************************************导言区*****************************************
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[11pt]{article}       %整份文档的默认正文字体大小设置为 11pt
+
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[super]{nth}
+\usepackage{xltxtra}
+\usepackage{xifthen}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{setspace}
+\usepackage{fontawesome5} 
+\usepackage[absolute,overlay]{textpos}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{everypage}
+
+%**********************************字体设置*******************************************
+\pagenumbering{gobble}
+\setstretch{1.2} % 全体1.2倍行间距
+
+% 西文字体设置
+\setmainfont{Microsoft Yahei.ttf}[
+    Path = fonts/ ,
+    BoldFont = Microsoft Yahei Bold.ttf
+]
+% 中文字体设置
+\setCJKmainfont{Microsoft Yahei.ttf}[
+    Path = fonts/ ,
+    BoldFont = Microsoft Yahei Bold.ttf
+]
+
+%**********************************样式设置*******************************************
+
+\setlength{\parindent}{0pt}       % 全局禁用缩进
+\setlist{noitemsep}               % 禁用列表中项目之间的额外垂直间距，但保留列表周围的间距
+%\setlist{nosep}	              % 禁用列表中项目之间的额外垂直间距及列表周围的间距
+\setlist[itemize]{topsep=0em, leftmargin=1.5pc}      % 增加了itemize顶部间距
+
+
+\definecolor{myblue}{RGB}{23, 73, 148}  % 定义国科大蓝
+
+% 一级标题
+\titleformat{\section}                  % 取消原标题前面的数字
+  {\Large\bfseries\raggedright}         % 字体改为large，bold，左对齐
+  {}{0em}                               % 可用于添加全局标题前缀
+  {}                                    % 可用于添加代码
+  [{\color{myblue}\titlerule}]          % 标题下方加一条线，颜色为myblue
+\titlespacing*{\section}{0cm}{*1}{*1}   % 标题左边留白，上方1倍，下方1倍
+
+% 二级标题
+\titleformat{\subsection}               % 取消原二级标题前面的数字
+  {\large\raggedright}                  % 字体改为large，左对齐
+  {}{0em}                               % 可用于添加全局二级标题前缀
+  {}                                    % 可用于添加代码
+\titlespacing*{\subsection}{0cm}{*1}{*0.5}      % 二级标题左边留白，上方1倍，下方0.5倍
+
+% 定义其他格式
+\newcommand{\datedsection}[2]{      % #1是标题，#2是日期
+  \section[#1]{#1 \hfill #2}        % [#1] 用于生成目录，{#1 \hfill #2} 在页面显示标题，% \hfill 自动填满中间空格
+}
+\newcommand{\datedsubsection}[2]{   % 二级标题
+  \subsection[#1]{#1 \hfill #2}     % #1 通常是“单位/学校”，#2 是“起止时间”。
+}
+\newcommand{\datedline}[2]{         % 定义一个名为 \datedline 的新命令，接受 2 个参数
+  {\par #1 \hfill #2 \par}          % \par 表示开启一个新段落。在这一行内，左边放内容 #1，右边放日期 #2。
+                                    % 两端的 \par 确保这一行独立存在，不会与前后文字混在一起。
+}
+\newcommand{\name}[1]{ 
+  \centerline{                      % \centerline 使内容居中；\Huge 设置最大号字；\bfseries 设置加粗
+    \Huge\bfseries
+    \xeCJKsetup{CJKglue=\hspace{0.2em plus 0.1em}} % 临时设置汉字之间的间距为0.3
+    #1
+  }
+  \xeCJKsetup{CJKglue=\hspace{0pt}} % 恢复默认间距，否则全文都会变松散
+}
+\newcommand{\contactInfo}[2]{       % #1邮箱，#2手机
+  \centerline{\large{ {\color{myblue}\faEnvelope}~{#1} \textperiodcentered\ \ {\color{myblue}\faPhone}~{#2}}}
+}
+\newcommand{\role}[2]{                 % #1职位/动作，#2具体描述
+  {\par \textit{#1} ~ #2 \par}         % \par 确保独立成段；\textit{#1} 将职位设为斜体
+  \vspace{0.5ex}                       
+}
+
+% 根据是否填写了内容自动决定是否显示分隔圆点
+\newcommand{\otherInfo}[4]{            % 定义接受 4 个参数的宏（例如：电话、邮箱、GitHub、领英）
+  \centerline{\large{ {#1}}            % 居中显示第 1 个必填参数
+    \ifthenelse{\isempty{#2}}%         % 如果第 2 个参数为空
+      { }                              % 则什么都不做
+      {\textperiodcentered\ \ {#2} }   % 如果不为空，则先画一个圆点再显示参数内容
+    \ifthenelse{\isempty{#3}}%         % 同样判断第 3 个参数
+      { }                              % 为空则跳过
+      {\textperiodcentered\ \ {#3} }   % 不为空则显示圆点和内容
+    \ifthenelse{\isempty{#4}}%         % 判断第 4 个参数
+      { } 
+      {\textperiodcentered\ \ {#4} }
+  }
+  \vspace{0.7ex}                       
+}
+
+%**********************************页面设置*******************************************
+
+% 页面大小与页边距
+\RequirePackage[
+	a4paper,
+	left=0.7in,
+	right=0.7in,
+	top=0.50in,
+	bottom=0.5in,
+	nohead
+]{geometry}
+
+\newcommand{\schoolCH}{中国科学院数字生命研究所}              %%%%%%！！别忘了改！！！！%%%%%%
+\newcommand{\schoolEN}{Institute of Digital Life, Chinese Academy of Sciences} %%%%%！！别忘了改！%%%%%%%
+
+% 页眉页脚
+\AddEverypageHook{
+    % 页眉
+    \begin{tikzpicture}[remember picture, overlay]
+        \node[anchor=north, inner sep=0pt](header) at (current page.north){
+            \includegraphics[width=\paperwidth]{images/header.png}
+        };
+        \node[anchor=west](school_logo) at (header.west){
+            \hspace{0.5cm}
+            \includegraphics[width=0.25\textwidth]{images/logo.png}
+        };
+        \node[anchor=east](school_name) at(header.east){
+            \textcolor{white}{\text{\schoolCH}}
+            \hspace{0.5cm}
+        };
+    % 页脚    
+        \node[anchor=south, inner sep=0pt](footer) at (current page.south){
+            \includegraphics[width=\paperwidth]{images/footer.png}
+        };
+        \node[anchor=east, xshift=-0.5cm, yshift=0.4cm] (school_name) at (current page.south east){
+              \textcolor{white}{\text{\schoolEN}}
+        };
+    % 背景
+        \node[opacity=0.7] at (current page.center) {   %0.7是透明度（这个素材本来就带一些透明度）
+                \includegraphics[width=0.7\paperwidth, keepaspectratio]{images/bg.png}   
+        };
+    \end{tikzpicture}
+}  
+
+\begin{document}
+% 这段别删，这个段莫名其妙解决了一个大bug
+        % 原本XeLaTeX好像和tikz有一点不兼容
+        % 如果直接使用background包或者AddEverypageHook的话，第一页的透明度会失效，会很丑
+        % 仿佛就像透明度相关的引擎没启动一样
+        % 但是莫名其妙的加上这段之后莫名其妙好了
+    \begin{tikzpicture}[remember picture, overlay]
+        % 注意这里opacity=0不要改，这里主要是启动了tikz的透明度功能
+        \node[opacity=0](background) at(current page.center){
+            \includegraphics[width=0.7\paperwidth, keepaspectratio]{images/bg.png}
+        };
+    \end{tikzpicture}
+    \vspace{3em}       % 第一页的缩进比较怪，建议加上这句调整
+
+
+
+%**********************************基础信息*******************************************
+% 姓名
+\name{章北海}   %北海哥的履历纯属编撰，切勿较真
+\vspace{2ex}   %下移一些，美观
+
+% 联系方式
+\contactInfo{zhang.beihai@pd.un.int}{197-010-2007}     %第一个括号里写邮箱，第二个写手机号
+
+% 其他信息
+%大括号内填写，最多填写4个，但是如果选择不填信息，那么大括号必须空着不写，而不能删除大括号。
+%\otherInfo后面的四个大括号里的所有信息都会在一行输出
+%如果想要写两行，那就用两次这个指令（\otherInfo{}{}{}{}）即可
+%例如：
+%\otherInfo{性别：男}{籍贯：中国}{}{}
+%\otherInfo{来历：刘慈欣《三体》}{}{}{}
+
+% 照片
+%需要放到images文件夹下，名字必须是you.png，如果不需要照片可以注释此段命令
+\begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=north east, inner sep=0pt] at ([xshift=-1.5cm, yshift=-1.7cm] current page.north east) {
+      \includegraphics[width=0.12\paperwidth]{images/you.png}      
+      %0.12的意思是照片的宽度是页面宽度的0.12倍，可以调整大小
+    };
+\end{tikzpicture}
+
+
+
+%**********************************正文**********************************************
+%***一般的大标题有：教育背景，实习（项目）经历，工作经历，自我评价，求职意向，等等
+\section{\textcolor{myblue}{\faGraduationCap}\ 教育背景}
+%***********一行子标题**************
+%***第一个大括号里的内容向左对齐，第二个大括号里的内容向右对齐
+%***\textbf{}括号里的字是粗体，\textit{}括号里的字是斜体
+\datedsubsection{\textbf{中国科学院大学}，中国科学院数字生命研究所，\textbf{博士}}{1984.9 - 1988.6}
+%***可添加多个\item，得到多个列举项，类似的也可以用\textbf{}、\textit{}做强调
+\begin{itemize} [parsep=0.5ex]
+  \item \textbf{数字生命专业}：专攻近现代海军史与向外太空跨越的战略转型。
+\end{itemize}
+
+\datedsubsection{\textbf{中国人民解放军海军大连舰艇学院}，军队综合性大学，\textbf{本科}}{1980.9 - 1984.6}
+\begin{itemize} [parsep=0.5ex]
+  \item \textbf{政工干部专业}：系统学习军事战略、心理战及组织领导力
+  \item GPA 99/100，总评排名 1/100，曾获优秀毕业生、三好学生等荣誉。
+\end{itemize}
+
+
+
+\vspace*{0.1cm}
+\section{\textcolor{myblue}{\faChild}\ 核心优势}
+\datedsubsection{\textbf{极端战略定力}}{}
+\begin{itemize}[parsep=0.5ex, itemsep=0.5ex]
+%  \item \textbf{地点}：中国
+  \item 拥有跨越两个世纪的全局战略视野，在全人类陷入“技术公理”误区时，独立推演出人类必败的真相，并制定唯一的文明延续方案。
+\end{itemize}
+
+\datedsubsection{\textbf{深层心理素质}}{}
+\begin{itemize}[parsep=0.5ex]
+  \item 成功躲避“思想钢印”检测，在长达数百年的冬眠与苏醒周期中，始终保持逻辑理性，不受集体情绪干扰。
+\end{itemize}
+
+\datedsubsection{\textbf{跨代指挥能力}}{}
+\begin{itemize}[parsep=0.5ex]
+  \item 精通近现代海军战术与恒星级战舰操作，具备在极端资源匮乏（黑暗战役）环境下的生存决策能力。
+\end{itemize}
+
+
+
+\vspace*{0.1cm}
+\section{\textcolor{myblue}{\faFlask}\ 科研经历}
+\datedsubsection{\textbf{“自然选择”号 (Natural Selection) 逃逸与文明种子计划}}{2273}
+\role{执行舰长}{星际深空探索阶段}
+\begin{itemize}[parsep=0.5ex]
+    \item 在“水滴”交战前夕，预判全人类舰队毁灭结局，指挥战舰进入最高过载加速，脱离太阳系。在“黑暗战役”中验证了宇宙社会学基本公理，完成了从“地球人类”向“星际人类”的心理与哲学转型。
+\end{itemize}
+
+\datedsubsection{\textbf{增援未来计划 (Support the Future)}，战略研究}{2007 - 2272}
+\role{项目发起人与首席执行官}{地球太空军政治部}
+\begin{itemize}[parsep=0.5ex]
+    \item 提出并实施跨代人才储备战略，选拔高素质军官进入冬眠，确保人类在两百年后的末日之战中拥有具备“旧时代”坚韧意志的指挥中枢。成功保留了人类文明最后的火种，在舰队全军覆没之际，为星际文明的建立提供了组织基础。
+\end{itemize}
+
+
+
+\vspace*{0.1cm}
+\section{\textcolor{myblue}{\faInfo}\ 技能与证书}
+\begin{itemize}[parsep=0.5ex]
+  \item \textbf{专业技能}： 熟练掌握恒星级战舰操控、深空燃料补给管理、超长距离通讯协议。
+  \item \textbf{语言及证书}：汉语（母语）、英语（流利）、太空军通用战术指令。
+  \item \textbf{荣誉证书}：地球太空军一级勋章（追授）、星际文明奠基人奖章。
+\end{itemize}
+
+
+
+\newpage  %换页。项目经历、竞赛经历、爱好特长、其他...
+
+
+
+\vspace*{0.1cm}
+\section{\textcolor{myblue}{\faInfo}\ 所获荣誉}
+\begin{itemize}[parsep=0.5ex]
+  \item \textbf{“星际文明奠基者”勋章}
+  \item \textbf{“自然选择”号功勋舰长}
+  \item \textbf{“增援未来”计划杰出代表}
+  \item \textbf{太空军战略远见奖}
+  \item \textbf{“地球文明永恒守望者”称号}
+\end{itemize}
+
+
+\end{document}
