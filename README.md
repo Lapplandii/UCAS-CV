@@ -3,7 +3,7 @@
 参考了NPU-CV简历模板中的部分代码。https://github.com/CSW33/NPU-CV/tree/main
 
 
-推荐使用Overleaf，直接选择XeLaTeX即可（左上角Menu->Settings->Compiler）。
+推荐使用Overleaf，直接选择`XeLaTeX`即可（左上角Menu->Settings->Compiler）。
 
 本地编译可能要使用三次XeLaTeX进行编译，否则无法正确显示照片。
 
