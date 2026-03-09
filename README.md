@@ -1,5 +1,5 @@
 # UCAS-CV
-国科大LaTeX简历模版，基于Overleaf上方渐鸿模版改编。
+中国科学院大学LaTeX简历模版，基于Overleaf上方渐鸿模版改编。
 参考了NPU-CV简历模板中的部分代码。https://github.com/CSW33/NPU-CV/tree/main
 
 
